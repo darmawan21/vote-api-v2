@@ -24,6 +24,8 @@ class Product extends Model
 
     ];
 
+    protected $appends = ['score'];
+
     public function galleries()
     {
         return $this->hasMany(ProductGallery::class, 'products_id', 'id'); 
@@ -32,6 +34,16 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'categories_id', 'id');
+    }
+
+    public function votes()
+    {
+        return $this->hasMany(Vote::class); 
+    }
+
+    public function getScoreAttribute()
+    {
+        return $this->votes()->sum('score');
     }
 
 }

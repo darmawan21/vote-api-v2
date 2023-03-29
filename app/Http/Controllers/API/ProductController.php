@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Vote;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -39,7 +42,14 @@ class ProductController extends Controller
             }
         }
 
-        $product = Product::with(['category', 'galleries']);
+        // $product = Product::with(['category', 'galleries', 'votes' => function ($query) {
+        //     $query->orderBy('score', 'desc');
+        // }]);
+        $product = Product::with(['category', 'galleries'])->orderBy(
+            DB::raw("(SELECT sum(score) FROM votes WHERE product_id = products.id)")
+            , 'desc');
+        
+        // $top_product = Product::with(['category', 'galleries', 'votes']);
 
         if($name) {
             $product->where('name', 'like', '%' . $name . '%');
@@ -70,5 +80,38 @@ class ProductController extends Controller
             'Data produk berhasil diambil'
         );
 
+    }
+
+    public function vote(Request $request, $productId)
+    {
+        $product = Product::find($productId);
+
+        if (!$product) {
+            return ResponseFormatter::error(
+                null,
+                'Product not found',
+                404
+            );
+        }
+
+        $user = Auth::user();  
+        
+        if ($product->votes()->where('user_id', $user->id)->exists()) {
+            return ResponseFormatter::error(
+                'You have already voted for this product',
+                400
+            );
+        }
+
+        $vote = new Vote();
+        $vote->score = $request->input('score');
+        $vote->product_id = $product->id;
+        $vote->user_id = $user->id;
+        $vote->save();
+
+        return ResponseFormatter::success(
+            $vote->score,
+            'Voted recorded',
+        );
     }
 }
