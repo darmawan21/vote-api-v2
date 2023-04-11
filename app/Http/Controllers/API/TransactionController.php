@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Illuminate\Http\Request;
@@ -70,14 +71,24 @@ class TransactionController extends Controller
             'status' => $request->status,
         ]);
 
+        $total_price = 0;
+
         foreach ($request->items as $product)
         {
+
+            $item_price = Product::findOrFail($product['id'])->price;
+            $total_price += $item_price * $product['quantity'];
+
             TransactionItem::create([
                 'users_id' => Auth::user()->id,
                 'products_id' => $product['id'],
-                'transactions_id' => $transaction->id,
+                'transactions_id' => $transaction['id'],
                 'quantity' => $product['quantity']
             ]);
+        }
+
+        if (!$request->total_price) {
+            $transaction->update(['total_price' => $total_price]);
         }
 
         return ResponseFormatter::success($transaction->load('items.product'), 'Transaksi berhasil');
