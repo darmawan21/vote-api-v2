@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('products', [ProductController::class, 'all']);
+Route::post('products', [ProductController::class, 'store']);
+Route::post('products/{product}/update', [ProductController::class, 'update']);
+Route::post('products/{product}', [ProductController::class, 'delete']);
 
 Route::get('categories', [ProductCategoryController::class, 'all']);
 Route::post('register', [UserController::class, 'register']);

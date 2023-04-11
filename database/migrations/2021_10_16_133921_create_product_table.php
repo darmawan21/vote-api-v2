@@ -21,6 +21,7 @@ class CreateProductTable extends Migration
             $table->longText('description');
             $table->string('tags')->nullable();
             $table->bigInteger('categories_id');
+            $table->string('image');
             $table->softDeletes();
             $table->timestamps();
         });

@@ -55,6 +55,7 @@ class TransactionController extends Controller
 
     public function checkout(Request $request)
     {
+        return $request->all();
         $request->validate([
             'items' => 'required|array',
             'items.*.id' => 'exists:products,id',
@@ -71,25 +72,36 @@ class TransactionController extends Controller
             'status' => $request->status,
         ]);
 
-        $total_price = 0;
+        // $total_price = 0;
+
+        // foreach ($request->items as $product)
+        // {
+
+        //     $item_price = Product::findOrFail($product['id'])->price;
+        //     $total_price += $item_price * $product['quantity'];
+
+        //     TransactionItem::create([
+        //         'users_id' => Auth::user()->id,
+        //         'products_id' => $product['id'],
+        //         'transactions_id' => $transaction['id'],
+        //         'quantity' => $product['quantity']
+        //     ]);
+        // }
+
+        // if (!$request->total_price) {
+        //     $transaction->update(['total_price' => $total_price]);
+        // }
 
         foreach ($request->items as $product)
         {
-
-            $item_price = Product::findOrFail($product['id'])->price;
-            $total_price += $item_price * $product['quantity'];
-
             TransactionItem::create([
                 'users_id' => Auth::user()->id,
                 'products_id' => $product['id'],
-                'transactions_id' => $transaction['id'],
+                'transactions_id' => $transaction->id,
                 'quantity' => $product['quantity']
             ]);
         }
 
-        if (!$request->total_price) {
-            $transaction->update(['total_price' => $total_price]);
-        }
 
         return ResponseFormatter::success($transaction->load('items.product'), 'Transaksi berhasil');
     }
