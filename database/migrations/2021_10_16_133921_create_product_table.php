@@ -20,6 +20,8 @@ class CreateProductTable extends Migration
             $table->float('price');
             $table->longText('description');
             $table->string('tags')->nullable();
+            $table->bigInteger('ref_sayur_id')->nullable();
+            $table->bigInteger('ref_lawuk_id')->nullable();
             $table->bigInteger('categories_id');
             $table->string('image');
             $table->softDeletes();

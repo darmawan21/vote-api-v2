@@ -15,14 +15,10 @@ class Product extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'categories_id',
-        'tags',
-        'image',
-
+    protected $guarded = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     protected $appends = ['score'];
@@ -35,6 +31,16 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(ProductCategory::class, 'categories_id', 'id');
+    }
+    
+    public function ref_sayur()
+    {
+        return $this->belongsTo(RefSayur::class, 'ref_sayur_id', 'id');
+    }
+
+    public function ref_lawuk()
+    {
+        return $this->belongsTo(RefLawuk::class, 'ref_lawak_id', 'id');
     }
 
     public function votes()

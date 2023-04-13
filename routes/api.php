@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\API\ProductCategoryController;
 use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\API\RefLawukController;
+use App\Http\Controllers\API\RefSayurController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\UserController;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,7 +27,21 @@ Route::post('products', [ProductController::class, 'store']);
 Route::post('products/{product}/update', [ProductController::class, 'update']);
 Route::post('products/{product}', [ProductController::class, 'delete']);
 
+Route::get('ref_sayur', [RefSayurController::class, 'all']);
+Route::post('ref_sayur', [RefSayurController::class, 'store']);
+Route::post('ref_sayur/{ref_sayur}/update', [RefSayurController::class, 'update']);
+Route::post('ref_sayur/{ref_sayur}', [RefSayurController::class, 'delete']);
+
+Route::get('ref_lawuk', [RefLawukController::class, 'all']);
+Route::post('ref_lawuk', [RefLawukController::class, 'store']);
+Route::post('ref_lawuk/{ref_lawuk}/update', [RefLawukController::class, 'update']);
+Route::post('ref_lawuk/{ref_lawuk}', [RefLawukController::class, 'delete']);
+
 Route::get('categories', [ProductCategoryController::class, 'all']);
+Route::post('categories', [ProductCategoryController::class, 'store']);
+Route::post('categories/{categories}/update', [ProductController::class, 'update']);
+Route::post('categories/{categories}', [ProductController::class, 'delete']);
+
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 

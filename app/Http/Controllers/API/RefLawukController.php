@@ -4,11 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\ProductCategory;
+use App\Models\RefLawuk;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class ProductCategoryController extends Controller
+class RefLawukController extends Controller
 {
     public function all(Request $request)
     {
@@ -19,34 +20,34 @@ class ProductCategoryController extends Controller
 
         if($id) {
 
-            $category = ProductCategory::find($id);
+            $ref_lawuk = RefLawuk::find($id);
 
-            if($category) {
+            if($ref_lawuk) {
                 return ResponseFormatter::success(
-                    $category,
-                    'Data kategori berhasil diambil'
+                    $ref_lawuk,
+                    'Data ref lawuk berhasil diambil'
                 );
             } else {
                 return ResponseFormatter::error(
                     null,
-                    'Data kategori tidak ada',
+                    'Data ref lawuk tidak ada',
                     404
                 );
             }
         }
 
-        $category = ProductCategory::query();
+        $ref_lawuk = RefLawuk::query();
 
         if($name) {
-            $category->where('name', 'like', '%' . $name . '%');
+            $ref_lawuk->where('name', 'like', '%' . $name . '%');
         }
 
         if($show_product) {
-            $category->with('products');
+            $ref_lawuk->with('products');
         }
 
         return ResponseFormatter::success(
-            $category->paginate($limit),
+            $ref_lawuk->paginate($limit),
             'Data list kategori berhasil diambil'
         );
     }
@@ -55,20 +56,21 @@ class ProductCategoryController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'name' => ['required', 'string', 'max:255']
+                'name' => ['required', 'string', 'max:255'],
+                'price' => ['required', 'integer'],
             ]);
 
-            ProductCategory::create($validatedData);
+            RefLawuk::create($validatedData);
 
             return ResponseFormatter::success(
                 $validatedData,
-                'Data produk kategori berhasil ditambahkan',
+                'Data Ref lawuk berhasil ditambahkan',
             );
         } catch (Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
-                'error' => $error,
-            ], 'Add Product Category Failed', 500);
+                'error' => $error
+            ], 'Add Ref lawuk Failed', 500);
         }
     }
 
@@ -81,35 +83,33 @@ class ProductCategoryController extends Controller
     
             $validatedData = $request->validate($rules);
     
-            ProductCategory::where('id', $id)->update($validatedData);
+            RefLawuk::where('id', $id)->update($validatedData);
     
             return ResponseFormatter::success([
                 $validatedData,
-                'Data produk kategori berhasil diupdate',
+                'Data ref lawuk berhasil diupdate',
             ], 'Authenticated');
         } catch (Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
                 'error' => $error,
-            ], 'Update Product Category Failed', 500);
+            ], 'Update Ref lawuk Failed', 500);
         }
     }
 
-    public function delete(Request $request, $categoryId)
+    public function delete(Request $request, $ref_lawuk_id)
     {
-        
         try {
-            $category = ProductCategory::where('id', $categoryId)->get();
-            ProductCategory::destroy($category->id);
+            DB::table('ref_lawuks')->where('id', $ref_lawuk_id)->delete();
             
             return ResponseFormatter::success([
-                'Data produk kategori berhasil dihapus'
+                'Data ref lawuk berhasil dihapus'
             ]);
         } catch (Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
                 'error' => $error,
-            ], 'Delete Product Category Failed', 500);
+            ], 'Delete Ref lawuk Failed', 500);
         }
     }
 }

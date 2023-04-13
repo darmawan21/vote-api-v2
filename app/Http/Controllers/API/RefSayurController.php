@@ -4,11 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\ProductCategory;
+use App\Models\RefSayur;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class ProductCategoryController extends Controller
+class RefSayurController extends Controller
 {
     public function all(Request $request)
     {
@@ -19,34 +20,34 @@ class ProductCategoryController extends Controller
 
         if($id) {
 
-            $category = ProductCategory::find($id);
+            $ref_sayur = RefSayur::find($id);
 
-            if($category) {
+            if($ref_sayur) {
                 return ResponseFormatter::success(
-                    $category,
-                    'Data kategori berhasil diambil'
+                    $ref_sayur,
+                    'Data ref sayur berhasil diambil'
                 );
             } else {
                 return ResponseFormatter::error(
                     null,
-                    'Data kategori tidak ada',
+                    'Data ref sayur tidak ada',
                     404
                 );
             }
         }
 
-        $category = ProductCategory::query();
+        $ref_sayur = RefSayur::query();
 
         if($name) {
-            $category->where('name', 'like', '%' . $name . '%');
+            $ref_sayur->where('name', 'like', '%' . $name . '%');
         }
 
         if($show_product) {
-            $category->with('products');
+            $ref_sayur->with('products');
         }
 
         return ResponseFormatter::success(
-            $category->paginate($limit),
+            $ref_sayur->paginate($limit),
             'Data list kategori berhasil diambil'
         );
     }
@@ -55,20 +56,21 @@ class ProductCategoryController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'name' => ['required', 'string', 'max:255']
+                'name' => ['required', 'string', 'max:255'],
+                'price' => ['required', 'integer'],
             ]);
 
-            ProductCategory::create($validatedData);
+            RefSayur::create($validatedData);
 
             return ResponseFormatter::success(
                 $validatedData,
-                'Data produk kategori berhasil ditambahkan',
+                'Data Ref Sayur berhasil ditambahkan',
             );
         } catch (Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
-                'error' => $error,
-            ], 'Add Product Category Failed', 500);
+                'error' => $error
+            ], 'Add Ref Sayur Failed', 500);
         }
     }
 
@@ -81,35 +83,33 @@ class ProductCategoryController extends Controller
     
             $validatedData = $request->validate($rules);
     
-            ProductCategory::where('id', $id)->update($validatedData);
+            RefSayur::where('id', $id)->update($validatedData);
     
             return ResponseFormatter::success([
                 $validatedData,
-                'Data produk kategori berhasil diupdate',
+                'Data ref sayur berhasil diupdate',
             ], 'Authenticated');
         } catch (Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
                 'error' => $error,
-            ], 'Update Product Category Failed', 500);
+            ], 'Update Ref Sayur Failed', 500);
         }
     }
 
-    public function delete(Request $request, $categoryId)
+    public function delete(Request $request, $ref_sayur_id)
     {
-        
         try {
-            $category = ProductCategory::where('id', $categoryId)->get();
-            ProductCategory::destroy($category->id);
+            DB::table('ref_sayurs')->where('id', $ref_sayur_id)->delete();
             
             return ResponseFormatter::success([
-                'Data produk kategori berhasil dihapus'
+                'Data ref sayur berhasil dihapus'
             ]);
         } catch (Exception $error) {
             return ResponseFormatter::error([
                 'message' => 'Something went wrong',
                 'error' => $error,
-            ], 'Delete Product Category Failed', 500);
+            ], 'Delete Ref Sayur Failed', 500);
         }
     }
 }
