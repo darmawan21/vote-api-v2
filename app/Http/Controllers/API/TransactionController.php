@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use Illuminate\Http\Request;
@@ -18,35 +17,28 @@ class TransactionController extends Controller
         $limit = $request->input('limit', 6);
         $status = $request->input('status');
 
-        if($id) 
-        {
+        if ($id) {
             $transaction = Transaction::with(['items.product'])->find($id);
 
-            if($transaction)
-            {
+            if ($transaction) {
                 return ResponseFormatter::success(
                     $transaction,
                     'Data transaksi berhasil diambil'
-                ); 
-            }
-            else
-            {
+                );
+            } else {
                 return ResponseFormatter::error(
                     null,
                     'Data transaksi tidak ada',
                     404
                 );
-
             }
-            
         }
         $transaction = Transaction::with(['items.product'])->where('users_id', Auth::user()->id);
 
-        if($status)
-        {
+        if ($status) {
             $transaction->where('status', $status);
         }
-        
+
         return ResponseFormatter::success(
             $transaction->paginate($limit),
             'Data list transaksi berhasil diambil'
@@ -57,13 +49,12 @@ class TransactionController extends Controller
     {
         return $request->all();
         $request->validate([
-            'items' => 'required|array',
-            'items.*.id' => 'exists:products,id',
+
             'total_price' => 'required',
             'shipping_price' => 'required',
             'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED',
         ]);
-
+        $items = json_decode($request->items);
         $transaction = Transaction::create([
             'users_id' => Auth::user()->id,
             'address' => $request->address,
@@ -72,37 +63,15 @@ class TransactionController extends Controller
             'status' => $request->status,
         ]);
 
-        // $total_price = 0;
 
-        // foreach ($request->items as $product)
-        // {
-
-        //     $item_price = Product::findOrFail($product['id'])->price;
-        //     $total_price += $item_price * $product['quantity'];
-
-        //     TransactionItem::create([
-        //         'users_id' => Auth::user()->id,
-        //         'products_id' => $product['id'],
-        //         'transactions_id' => $transaction['id'],
-        //         'quantity' => $product['quantity']
-        //     ]);
-        // }
-
-        // if (!$request->total_price) {
-        //     $transaction->update(['total_price' => $total_price]);
-        // }
-
-        foreach ($request->items as $product)
-        {
+        for ($i = 0; $i < count($items); $i++) {
             TransactionItem::create([
                 'users_id' => Auth::user()->id,
-                'products_id' => $product['id'],
+                'products_id' => $items[$i]->id,
                 'transactions_id' => $transaction->id,
-                'quantity' => $product['quantity']
+                'quantity' => $items[$i]->quantity,
             ]);
         }
-
-
-        return ResponseFormatter::success($transaction->load('items.product'), 'Transaksi berhasil');
+        return ResponseFormatter::success('Ok', 'Transaksi berhasil');
     }
 }
