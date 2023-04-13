@@ -23,28 +23,12 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('products', [ProductController::class, 'all']);
-Route::post('products', [ProductController::class, 'store']);
-Route::post('products/{product}/update', [ProductController::class, 'update']);
-Route::post('products/{product}', [ProductController::class, 'delete']);
-
 Route::get('ref_sayur', [RefSayurController::class, 'all']);
-Route::post('ref_sayur', [RefSayurController::class, 'store']);
-Route::post('ref_sayur/{ref_sayur}/update', [RefSayurController::class, 'update']);
-Route::post('ref_sayur/{ref_sayur}', [RefSayurController::class, 'delete']);
-
 Route::get('ref_lawuk', [RefLawukController::class, 'all']);
-Route::post('ref_lawuk', [RefLawukController::class, 'store']);
-Route::post('ref_lawuk/{ref_lawuk}/update', [RefLawukController::class, 'update']);
-Route::post('ref_lawuk/{ref_lawuk}', [RefLawukController::class, 'delete']);
-
 Route::get('categories', [ProductCategoryController::class, 'all']);
-Route::post('categories', [ProductCategoryController::class, 'store']);
-Route::post('categories/{categories}/update', [ProductController::class, 'update']);
-Route::post('categories/{categories}', [ProductController::class, 'delete']);
 
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
-
 
 Route::middleware('auth:sanctum')->group(function (){
     Route::get('user', [UserController::class, 'fetch']);
@@ -53,4 +37,26 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::get('transactions', [TransactionController::class, 'all']);
     Route::post('checkout', [TransactionController::class, 'checkout']);
     Route::post('products/{product}/vote', [ProductController::class, 'vote']);
+});
+
+Route::middleware(['auth:sanctum', 'verified', 'admin'])->group(function (){
+    // Product
+    Route::post('products', [ProductController::class, 'store']);
+    Route::post('products/{product}/update', [ProductController::class, 'update']);
+    Route::post('products/{product}', [ProductController::class, 'delete']);
+
+    // Ref Sayur
+    Route::post('ref_sayur', [RefSayurController::class, 'store']);
+    Route::post('ref_sayur/{ref_sayur}/update', [RefSayurController::class, 'update']);
+    Route::post('ref_sayur/{ref_sayur}', [RefSayurController::class, 'delete']);
+
+    // Ref Lauk
+    Route::post('ref_lawuk', [RefLawukController::class, 'store']);
+    Route::post('ref_lawuk/{ref_lawuk}/update', [RefLawukController::class, 'update']);
+    Route::post('ref_lawuk/{ref_lawuk}', [RefLawukController::class, 'delete']);
+
+    // Categories
+    Route::post('categories', [ProductCategoryController::class, 'store']);
+    Route::post('categories/{categories}/update', [ProductController::class, 'update']);
+    Route::post('categories/{categories}', [ProductController::class, 'delete']);
 });

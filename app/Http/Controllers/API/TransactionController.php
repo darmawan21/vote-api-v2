@@ -6,6 +6,7 @@ use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,8 +21,12 @@ class TransactionController extends Controller
         if ($id) {
             $transaction = Transaction::with(['items.product'])->find($id);
 
+            $admin = User::where('roles', 'ADMIN')->first();
+            $telp = $admin->phone;
+            
             if ($transaction) {
                 return ResponseFormatter::success(
+                    $telp,
                     $transaction,
                     'Data transaksi berhasil diambil'
                 );
