@@ -46,7 +46,7 @@ class ProductCategoryController extends Controller
         }
 
         return ResponseFormatter::success(
-            $category->paginate($limit),
+            $category->paginate(),
             'Data list kategori berhasil diambil'
         );
     }

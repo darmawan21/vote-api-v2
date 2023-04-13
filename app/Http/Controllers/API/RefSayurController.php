@@ -14,7 +14,7 @@ class RefSayurController extends Controller
     public function all(Request $request)
     {
         $id = $request->input('id');
-        $limit = $request->input('limit', 6);
+        // $limit = $request->input('limit', 6);
         $name = $request->input('name');
         $show_product = $request->input('show_product');
 
@@ -47,7 +47,7 @@ class RefSayurController extends Controller
         }
 
         return ResponseFormatter::success(
-            $ref_sayur->paginate($limit),
+            $ref_sayur->paginate(),
             'Data list kategori berhasil diambil'
         );
     }

@@ -18,7 +18,7 @@ class ProductController extends Controller
     public function all(Request $request)
     {
         $id = $request->input('id');
-        $limit = $request->input('limit', 6);
+        // $limit = $request->input('limit', 6);
         $name = $request->input('name');
         $description = $request->input('description');
         $tags = $request->input('tags');
@@ -79,7 +79,7 @@ class ProductController extends Controller
         }
 
         return ResponseFormatter::success(
-            $product->paginate($limit),
+            $product->paginate(),
             'Data produk berhasil diambil'
         );
 
