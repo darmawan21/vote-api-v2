@@ -23,7 +23,7 @@ class TransactionController extends Controller
 
             $admin = User::where('roles', 'ADMIN')->first();
             $telp = $admin->phone;
-            
+
             if ($transaction) {
                 return ResponseFormatter::success(
                     $telp,
@@ -52,7 +52,6 @@ class TransactionController extends Controller
 
     public function checkout(Request $request)
     {
-        return $request->all();
         $request->validate([
 
             'total_price' => 'required',
@@ -77,6 +76,6 @@ class TransactionController extends Controller
                 'quantity' => $items[$i]->quantity,
             ]);
         }
-        return ResponseFormatter::success('Ok', 'Transaksi berhasil');
+        return ResponseFormatter::success($transaction->load('items.product'), 'Transaksi berhasil');
     }
 }
