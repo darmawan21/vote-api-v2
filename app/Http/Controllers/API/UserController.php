@@ -29,6 +29,7 @@ class UserController extends Controller
                 'username' => $request->username,
                 'email' => $request->email,
                 'phone' => $request->phone,
+                'address' => $request->address,
                 'password' => Hash::make($request->password),
 
             ]);
@@ -43,14 +44,14 @@ class UserController extends Controller
                 'user' => $user
             ], 'User Registered');
         } catch (Exception $error) {
-             return ResponseFormatter::error([
-                 'message' => 'Something went wrong',
-                 'error' => $error
-             ], 'Authentication Failed', 500);
+            return ResponseFormatter::error([
+                'message' => 'Something went wrong',
+                'error' => $error
+            ], 'Authentication Failed', 500);
         }
     }
 
-    public function login(Request $request) 
+    public function login(Request $request)
     {
         try {
             $request->validate([
@@ -59,7 +60,7 @@ class UserController extends Controller
             ]);
 
             $credentials = request(['email', 'password']);
-            if(!Auth::attempt($credentials)){
+            if (!Auth::attempt($credentials)) {
                 return ResponseFormatter::error([
                     'message' => 'Unauthorized'
                 ], 'Authentication Failed', 500);
@@ -67,7 +68,7 @@ class UserController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            if(!Hash::check($request->password, $user->password, [])) {
+            if (!Hash::check($request->password, $user->password, [])) {
                 throw new \Exception('Invalid Credentials');
             }
 
@@ -107,5 +108,4 @@ class UserController extends Controller
 
         return ResponseFormatter::success($token, 'Token Revoked');
     }
-
 }
