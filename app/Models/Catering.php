@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RefLawuk extends Model
+class Catering extends Model
 {
     use HasFactory;
     protected $guarded = [
@@ -14,13 +14,12 @@ class RefLawuk extends Model
         'deleted_at',
     ];
 
-    public function products()
+    public function refLawuks()
     {
-        return $this->hasMany(Product::class, 'categories_id', 'id');
+        return $this->hasMany(RefLawuk::class, 'id', 'lauk_id');
     }
-
-    public function caterings()
+    public function refSayurs()
     {
-        return $this->hasMany(Catering::class, 'lauk_id', 'id');
+        return $this->hasMany(RefSayur::class, 'id', 'sayur_id');
     }
 }

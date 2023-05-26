@@ -16,6 +16,11 @@ class RefSayur extends Model
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'ref_sayur_id', 'id'); 
+        return $this->hasMany(Product::class, 'ref_sayur_id', 'id');
+    }
+
+    public function caterings()
+    {
+        return $this->hasMany(Catering::class, 'sayur_id', 'id');
     }
 }

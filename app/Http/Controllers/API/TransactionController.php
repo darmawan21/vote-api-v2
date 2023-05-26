@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ResponseFormatter;
 use App\Http\Controllers\Controller;
+use App\Models\Catering;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Models\User;
@@ -52,30 +53,58 @@ class TransactionController extends Controller
 
     public function checkout(Request $request)
     {
+
         $request->validate([
 
             'total_price' => 'required',
             'shipping_price' => 'required',
             'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED',
         ]);
-        $items = json_decode($request->items);
-        $transaction = Transaction::create([
-            'users_id' => Auth::user()->id,
-            'address' => $request->address,
-            'total_price' => $request->total_price,
-            'shipping_price' => $request->shipping_price,
-            'status' => $request->status,
-        ]);
 
-
-        for ($i = 0; $i < count($items); $i++) {
-            TransactionItem::create([
+        if ($request->is_catering == '1') {
+            $catering = Catering::create([
                 'users_id' => Auth::user()->id,
-                'products_id' => $items[$i]->id,
-                'transactions_id' => $transaction->id,
-                'quantity' => $items[$i]->quantity,
+                'sayur_id' => $request->sayur,
+                'lauk_id' => $request->lauk,
+                'harga' => $request->total_price,
+                'tanggal' => $request->tanggal,
             ]);
+
+
+
+            $transaction = Transaction::create([
+                'users_id' => Auth::user()->id,
+                'address' => $request->address,
+                'total_price' => $request->total_price,
+                'shipping_price' => $request->shipping_price,
+                'status' => $request->status,
+                'is_catering' => $request->is_catering,
+                'catering_id' => $catering->id,
+            ]);
+        } else {
+            $items = json_decode($request->items);
+
+
+            $transaction = Transaction::create([
+                'users_id' => Auth::user()->id,
+                'address' => $request->address,
+                'total_price' => $request->total_price,
+                'shipping_price' => $request->shipping_price,
+                'status' => $request->status,
+                'is_catering' => $request->is_catering,
+            ]);
+
+
+            for ($i = 0; $i < count($items); $i++) {
+                TransactionItem::create([
+                    'users_id' => Auth::user()->id,
+                    'products_id' => $items[$i]->id,
+                    'transactions_id' => $transaction->id,
+                    'quantity' => $items[$i]->quantity,
+                ]);
+            }
         }
-        return ResponseFormatter::success($transaction->load('items.product'), 'Transaksi berhasil');
+
+        return ResponseFormatter::success('OK', 'Transaksi berhasil');
     }
 }

@@ -22,6 +22,8 @@ class Transaction extends Model
         'total_price',
         'shipping_price',
         'status',
+        'is_catering',
+        'catering_id',
     ];
 
     public function user()
@@ -33,5 +35,4 @@ class Transaction extends Model
     {
         return $this->hasMany(TransactionItem::class, 'transactions_id', 'id');
     }
-
 }

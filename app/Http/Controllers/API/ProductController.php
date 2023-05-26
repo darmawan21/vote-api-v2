@@ -27,11 +27,10 @@ class ProductController extends Controller
         $price_from = $request->input('price_from');
         $price_to = $request->input('price_to');
 
-        if($id)
-        {
+        if ($id) {
             $product = Product::with(['category', 'galleries'])->find($id);
 
-            if($product) {
+            if ($product) {
                 return ResponseFormatter::success(
                     $product,
                     'Data produk berhasil diambil'
@@ -49,32 +48,33 @@ class ProductController extends Controller
         //     $query->orderBy('score', 'desc');
         // }]);
         $product = Product::with(['category', 'galleries'])->orderBy(
-            DB::raw("(SELECT sum(score) FROM votes WHERE product_id = products.id)")
-            , 'desc');
-        
+            DB::raw("(SELECT sum(score) FROM votes WHERE product_id = products.id)"),
+            'desc'
+        );
+
         // $top_product = Product::with(['category', 'galleries', 'votes']);
 
-        if($name) {
+        if ($name) {
             $product->where('name', 'like', '%' . $name . '%');
         }
-        
-        if($description) {
+
+        if ($description) {
             $product->where('description', 'like', '%' . $description . '%');
         }
 
-        if($tags) {
+        if ($tags) {
             $product->where('tags', 'like', '%' . $tags . '%');
         }
 
-        if($price_from) {
+        if ($price_from) {
             $product->where('price_from', '>=', $price_from);
         }
 
-        if($price_to) {
+        if ($price_to) {
             $product->where('price_to', '<=', $price_to);
         }
 
-        if($categories) {
+        if ($categories) {
             $product->where('categories_id', $categories);
         }
 
@@ -82,7 +82,6 @@ class ProductController extends Controller
             $product->paginate(),
             'Data produk berhasil diambil'
         );
-
     }
 
     public function vote(Request $request, $productId)
@@ -97,8 +96,8 @@ class ProductController extends Controller
             );
         }
 
-        $user = Auth::user();  
-        
+        $user = Auth::user();
+
         if ($product->votes()->where('user_id', $user->id)->exists()) {
             return ResponseFormatter::error(
                 'You have already voted for this product',
@@ -125,7 +124,7 @@ class ProductController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'description' => ['required', 'string', 'max:255'],
                 'price' => ['required', 'integer'],
-                'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:1024'],
+                'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:6144'],
                 'categories_id' => ['required'],
                 'tags' => ['required'],
             ]);
@@ -159,18 +158,18 @@ class ProductController extends Controller
                 'categories_id' => ['required'],
                 'tags' => ['required'],
             ];
-    
+
             $validatedData = $request->validate($rules);
-    
-            if ($request->file('image')) {
-                if ($request->oldImage) {
-                    Storage::delete($request->oldImage);
-                }
-                $validatedData['image'] = $request->file('image')->store('product-images');
-            }
-    
+
+            // if ($request->file('image')) {
+            //     if ($request->oldImage) {
+            //         Storage::delete($request->oldImage);
+            //     }
+            //     $validatedData['image'] = $request->file('image')->store('product-images');
+            // }
+
             Product::where('id', $id)->update($validatedData);
-    
+
             return ResponseFormatter::success([
                 $validatedData,
                 'Data produk berhasil diupdate',
@@ -183,16 +182,16 @@ class ProductController extends Controller
         }
     }
 
-    public function delete(Request $request, $productId)
+    public function delete($productId)
     {
-        
+
         try {
-            $product = Product::where('id', $productId)->get();
-            if ($product->image) {
-                Storage::delete($product->image);
-            }
+            $product = Product::find($productId);
+            // if ($product->image) {
+            //     Storage::delete($product->image);
+            // }
             Product::destroy($product->id);
-            
+
             return ResponseFormatter::success([
                 'Data produk berhasil dihapus'
             ]);
