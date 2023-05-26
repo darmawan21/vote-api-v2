@@ -39,7 +39,7 @@ class TransactionController extends Controller
                 );
             }
         }
-        $transaction = Transaction::with(['items.product'])->where('users_id', Auth::user()->id);
+        $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])->where('users_id', Auth::user()->id);
 
         if ($status) {
             $transaction->where('status', $status);

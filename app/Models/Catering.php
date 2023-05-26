@@ -16,10 +16,10 @@ class Catering extends Model
 
     public function refLawuks()
     {
-        return $this->hasMany(RefLawuk::class, 'id', 'lauk_id');
+        return $this->hasOne(RefLawuk::class, 'id', 'lauk_id');
     }
     public function refSayurs()
     {
-        return $this->hasMany(RefSayur::class, 'id', 'sayur_id');
+        return $this->hasOne(RefSayur::class, 'id', 'sayur_id');
     }
 }
