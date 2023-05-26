@@ -120,6 +120,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         try {
+
             $validatedData = $request->validate([
                 'name' => ['required', 'string', 'max:255'],
                 'description' => ['required', 'string', 'max:255'],
@@ -129,8 +130,10 @@ class ProductController extends Controller
                 'tags' => ['required'],
             ]);
 
-            if ($request->file('image')) {
-                $validatedData['image'] = $request->file('image')->store('product-images');
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $path =  $file->store('public');
+                $validatedData['image'] = basename($path);
             }
 
             Product::create($validatedData);
@@ -154,12 +157,17 @@ class ProductController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'description' => ['required', 'string', 'max:255'],
                 'price' => ['required', 'integer'],
-                'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:1024'],
                 'categories_id' => ['required'],
                 'tags' => ['required'],
             ];
 
             $validatedData = $request->validate($rules);
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $path =  $file->store('public');
+                $validatedData['image'] = basename($path);
+            }
 
             // if ($request->file('image')) {
             //     if ($request->oldImage) {
