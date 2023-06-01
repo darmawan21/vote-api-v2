@@ -30,16 +30,17 @@ Route::get('categories', [ProductCategoryController::class, 'all']);
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function (){
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('user', [UserController::class, 'fetch']);
     Route::post('user', [UserController::class, 'updateProfile']);
     Route::post('logout', [UserController::class, 'logout']);
     Route::get('transactions', [TransactionController::class, 'all']);
     Route::post('checkout', [TransactionController::class, 'checkout']);
+    Route::post('konfirmasi', [TransactionController::class, 'konfirmasi']);
     Route::post('products/{product}/vote', [ProductController::class, 'vote']);
 });
 
-Route::middleware(['auth:sanctum', 'verified', 'admin'])->group(function (){
+Route::middleware(['auth:sanctum', 'verified', 'admin'])->group(function () {
     // Product
     Route::post('products', [ProductController::class, 'store']);
     Route::post('products/{product}/update', [ProductController::class, 'update']);

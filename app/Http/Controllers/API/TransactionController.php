@@ -39,7 +39,8 @@ class TransactionController extends Controller
                 );
             }
         }
-        $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])->where('users_id', Auth::user()->id);
+        $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])
+            ->where('users_id', Auth::user()->id)->orderByDesc('id');
 
         if ($status) {
             $transaction->where('status', $status);
@@ -58,7 +59,7 @@ class TransactionController extends Controller
 
             'total_price' => 'required',
             'shipping_price' => 'required',
-            'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED',
+            'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED,PROCESS',
         ]);
 
         if ($request->is_catering == '1') {
@@ -68,6 +69,7 @@ class TransactionController extends Controller
                 'lauk_id' => $request->lauk,
                 'harga' => $request->total_price,
                 'tanggal' => $request->tanggal,
+                'jumlah' => $request->jumlah,
             ]);
 
 
@@ -106,5 +108,25 @@ class TransactionController extends Controller
         }
 
         return ResponseFormatter::success('OK', 'Transaksi berhasil');
+    }
+
+    public function konfirmasi(Request $request)
+    {
+
+        $request->validate([
+            'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED,PROCESS',
+        ]);
+
+        $transaction = Transaction::find($request->id);
+
+        if ($transaction) {
+            $transaction->status = $request->status;
+            $transaction->save();
+
+            // Status catering berhasil diperbarui
+            // Lakukan tindakan lain di sini jika diperlukan
+        }
+
+        return ResponseFormatter::success('OK', 'Konfirmasi berhasil');
     }
 }
