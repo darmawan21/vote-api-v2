@@ -107,7 +107,7 @@ class ProductController extends Controller
 
         $vote = new Vote();
         $vote->score = $request->input('score');
-        $vote->product_id = $product->id;
+        $vote->product_id = $productId;
         $vote->user_id = $user->id;
         $vote->save();
 
@@ -157,6 +157,7 @@ class ProductController extends Controller
                 'name' => ['required', 'string', 'max:255'],
                 'description' => ['required', 'string', 'max:255'],
                 'price' => ['required', 'integer'],
+                'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:6144'],
                 'categories_id' => ['required'],
                 'tags' => ['required'],
             ];
