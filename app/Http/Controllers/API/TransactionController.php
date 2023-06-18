@@ -40,7 +40,7 @@ class TransactionController extends Controller
             }
         }
         $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])
-            ->where('users_id', Auth::user()->id)->orderByDesc('id');
+            ->where('users_id', Auth::user()->id)->orderByDesc('created_at');
 
         if ($status) {
             $transaction->where('status', $status);

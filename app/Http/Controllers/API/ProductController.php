@@ -22,7 +22,6 @@ class ProductController extends Controller
         $name = $request->input('name');
         $description = $request->input('description');
         $tags = $request->input('tags');
-        $categories = $request->input('categories');
 
         $price_from = $request->input('price_from');
         $price_to = $request->input('price_to');
@@ -74,9 +73,7 @@ class ProductController extends Controller
             $product->where('price_to', '<=', $price_to);
         }
 
-        if ($categories) {
-            $product->where('categories_id', $categories);
-        }
+      
 
         return ResponseFormatter::success(
             $product->paginate(),
@@ -119,6 +116,8 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+
+        
         try {
 
             $validatedData = $request->validate([
@@ -126,7 +125,7 @@ class ProductController extends Controller
                 'description' => ['required', 'string', 'max:255'],
                 'price' => ['required', 'integer'],
                 'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:6144'],
-                'categories_id' => ['required'],
+                'is_voting' => ['required'],
                 'tags' => ['required'],
             ]);
 
@@ -134,6 +133,10 @@ class ProductController extends Controller
                 $file = $request->file('image');
                 $path =  $file->store('public');
                 $validatedData['image'] = basename($path);
+            }
+
+            if($request->is_voting) {
+                $validatedData['max_vote'] = $request->max_vote;
             }
 
             Product::create($validatedData);
@@ -158,7 +161,7 @@ class ProductController extends Controller
                 'description' => ['required', 'string', 'max:255'],
                 'price' => ['required', 'integer'],
                 'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:6144'],
-                'categories_id' => ['required'],
+                'is_voting' => ['required'],
                 'tags' => ['required'],
             ];
 
