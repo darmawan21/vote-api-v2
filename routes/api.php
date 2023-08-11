@@ -26,7 +26,7 @@ Route::get('products', [ProductController::class, 'all']);
 Route::get('ref_sayur', [RefSayurController::class, 'all']);
 Route::get('ref_lawuk', [RefLawukController::class, 'all']);
 Route::get('categories', [ProductCategoryController::class, 'all']);
-
+Route::get('laporan', [TransactionController::class, 'laporan']);
 Route::post('register', [UserController::class, 'register']);
 Route::post('login', [UserController::class, 'login']);
 

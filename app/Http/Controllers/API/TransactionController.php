@@ -18,29 +18,36 @@ class TransactionController extends Controller
         $id = $request->input('id');
         // $limit = $request->input('limit', 6);
         $status = $request->input('status');
+        $admin = User::where('roles', 'ADMIN')->first();
+        // if ($id) {
+        //     $transaction = Transaction::with(['items.product'])->find($id);
 
-        if ($id) {
-            $transaction = Transaction::with(['items.product'])->find($id);
+           
+        //     $telp = $admin->phone;
 
-            $admin = User::where('roles', 'ADMIN')->first();
-            $telp = $admin->phone;
+        //     if ($transaction) {
+        //         return ResponseFormatter::success(
+        //             $telp,
+        //             $transaction,
+        //             'Data transaksi berhasil diambil'
+        //         );
+        //     } else {
+        //         return ResponseFormatter::error(
+        //             null,
+        //             'Data transaksi tidak ada',
+        //             404
+        //         );
+        //     }
+        // }
 
-            if ($transaction) {
-                return ResponseFormatter::success(
-                    $telp,
-                    $transaction,
-                    'Data transaksi berhasil diambil'
-                );
-            } else {
-                return ResponseFormatter::error(
-                    null,
-                    'Data transaksi tidak ada',
-                    404
-                );
-            }
-        }
-        $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])
+        if($admin->id == Auth::user()->id) {
+            $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])
+            ->orderByDesc('created_at');
+        } else {
+            $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])
             ->where('users_id', Auth::user()->id)->orderByDesc('created_at');
+        }
+       
 
         if ($status) {
             $transaction->where('status', $status);
@@ -49,6 +56,33 @@ class TransactionController extends Controller
         return ResponseFormatter::success(
             $transaction->paginate(),
             'Data list transaksi berhasil diambil'
+        );
+    }
+
+    public function laporan(Request $request)
+    {
+    
+
+        $transaction = Transaction::with(['items.product', 'caterings.refSayurs', 'caterings.refLawuks'])->where('status', 'SUCCESS')
+        ->orderByDesc('created_at');
+       
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+    
+            // Pastikan format tanggal yang valid (YYYY-MM-DD)
+            $request->validate([
+                'start_date' => 'date_format:Y-m-d',
+                'end_date' => 'date_format:Y-m-d',
+            ]);
+    
+            $transaction->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+
+        return ResponseFormatter::success(
+            $transaction->paginate(),
+            'Data list laporan berhasil diambil'
         );
     }
 
@@ -115,12 +149,25 @@ class TransactionController extends Controller
 
         $request->validate([
             'status' => 'required|in:PENDING,SUCCESS,CANCELLED,FAILED,SHIPPING,SHIPPED,PROCESS',
+            // 'image' => ['nullable', 'mimes:jpg,png,jpeg', 'file', 'max:6144'],
         ]);
+
+        if($request->image) {
+            if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path =  $file->store('public/bukti');
+            $request->image = basename($path);
+        }
+        }
+      
 
         $transaction = Transaction::find($request->id);
 
         if ($transaction) {
             $transaction->status = $request->status;
+            if($request->hasFile('image')) {
+                $transaction->image = 'bukti/' .  $request->image ;
+            }
             $transaction->save();
 
             // Status catering berhasil diperbarui
